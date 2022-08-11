@@ -1,0 +1,27 @@
+{
+  "name": "@iamankit263/react-native-linkedin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.tsx",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "minor": "npm version patch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamankit263/react-native-linkedin.git"
+  },
+  "author": "Ankit Kumar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iamankit263/react-native-linkedin/issues"
+  },
+  "homepage": "https://github.com/iamankit263/react-native-linkedin#readme",
+  "keywords": [
+    "react-native",
+    "linkedin-oauth2",
+    "react-native-linkedin",
+    "linkedin",
+    "signin-with-linkedin"
+  ]
+}
