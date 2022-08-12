@@ -36,10 +36,11 @@ class SignIn extends Component {
       ACCESS_TOKEN_URL: "https://www.linkedin.com/uas/oauth2/accessToken",
       PROFILE_URL: "https://api.linkedin.com/v2/me",
       EMAIL_URL: "https://api.linkedin.com/v2/emailAddress",
+      CONNECTION_URL: "https://api.linkedin.com/v2/connections/urn:li:person:",
       permissions: props.permissions
         ? props.permissions
         : ["r_basicprofile", "r_emailaddress"],
-      clientId: props.clientId,
+      clientId: props.clientID,
       clientSecret: props.clientSecret,
       redirectUri: props.redirectUri,
       authState: props.authState,
@@ -117,6 +118,10 @@ class SignIn extends Component {
     })}`;
   }
 
+  getConnectionPayload(id) {
+    return `${this.state.CONNECTION_URL}${id}}`;
+  }
+
   getProfile() {
     fetch(this.getProfilePayload())
       .then((response) => {
@@ -130,7 +135,9 @@ class SignIn extends Component {
           firstName: profile.firstName.localized[localizedFirstName],
           lastName: profile.lastName.localized[localizedFirstName],
           authAccessToken: this.state.authAccessToken,
-          profilePicture: profile?.profilePicture["displayImage~"]?.elements?.[0]?.identifiers?.[0]?.identifier ?? ''
+          profilePicture:
+            profile?.profilePicture["displayImage~"]?.elements?.[0]
+              ?.identifiers?.[0]?.identifier ?? "",
         };
 
         if (this.state.permissions.includes("r_emailaddress")) {
@@ -147,10 +154,25 @@ class SignIn extends Component {
         return response.json();
       })
       .then((email) => {
-        this.props.onSuccess({
-          email: email.elements[0][`handle~`].emailAddress,
-          profile: profile,
-        });
+        if (this.state.permissions.includes("r_1st_connections_size")) {
+          fetch(this.getConnectionPayload(profile.id))
+            .then((resp) => {
+              return resp.json();
+            })
+            .then((firstDegreeSize) => {
+              this.props.onSuccess({
+                email: email.elements[0][`handle~`].emailAddress,
+                profile: profile,
+                connection: firstDegreeSize,
+              });
+            })
+            .catch((err) => {});
+        } else {
+          this.props.onSuccess({
+            email: email.elements[0][`handle~`].emailAddress,
+            profile: profile,
+          });
+        }
       })
       .catch((err) => {});
   }
@@ -161,23 +183,7 @@ class SignIn extends Component {
     }
   }
 
-  getProfileTest() {
-    // fetch(
-    //   'https://api.linkedin.com/v2/me?access_token=' +
-    //     this.state.authAccessToken,
-    // )
-    //   .then(response => {
-    //     return response.json();
-    //   })
-    //   .then(result => {
-    //     if (result.access_token) {
-    //     }
-    //   });
-    // Promise.all([])
-  }
-
   hideModal() {
-    // this.setState({modalVisible: false});
     this.props.onClose();
   }
   onLoadStart = async ({ nativeEvent: { url } }) => {
@@ -192,7 +198,6 @@ class SignIn extends Component {
       this.setState({ authCode: params.code }, () => {
         this.getAccessToken(params.code);
       });
-      //successfully authenticated
     }
   };
 
