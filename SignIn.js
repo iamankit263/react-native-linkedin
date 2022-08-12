@@ -119,7 +119,9 @@ class SignIn extends Component {
   }
 
   getConnectionPayload(id) {
-    return `${this.state.CONNECTION_URL}${id}}`;
+    return `${this.state.CONNECTION_URL}${id}?${querystring.stringify({
+      oauth2_access_token: this.state.authAccessToken
+    })}`;
   }
 
   getProfile() {
